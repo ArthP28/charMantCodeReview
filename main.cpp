@@ -12,7 +12,8 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 
-int findCharPosition(const char numString[], char charToFind);
+int findCharAtPosition(const char numString[], char charToFind);
+int charToInt(char charToConvert);
 
 int main()
 {
@@ -79,7 +80,10 @@ bool characteristic(const char numString[], int& c)
 {
     //hard coded return value to make the main() work
     c = 123;
-    int sampleFind = findCharPosition(numString, '.');
+    int ch = charToInt(numString[0]) + charToInt(numString[1]);
+    int locationOfFloatingPoint = findCharAtPosition(numString, '.');
+    cout << ch << endl;
+    // Count from the beginning of the floating point to the largest whole place value
     return true;
 }
 //--
@@ -94,16 +98,20 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
 // ******** MY HELPER FUNCTIONS ********
 
 // Returns the location of a specific character to find. It works like std::find() but it does not require range parameters
-int findCharPosition(const char numString[], char charToFind){
+int findCharAtPosition(const char numString[], char charToFind){
     int currentPosition = 0;
-    while(numString[currentPosition] != charToFind){
-        if(numString[currentPosition] != '\0'){
-            currentPosition = -1;
-            break;
-        }
+    while(numString[currentPosition] != '\0' && numString[currentPosition] != charToFind){
         currentPosition++;
     }
-    return currentPosition; // Either returns the position of the char if found, or -1 if it cannot be found
+    return currentPosition; // Either returns the position of the char if found, or the length of the string if it cannot be found
+}
+
+int charToInt(char charToConvert){ // Converts a numeric char into an integer
+    int result = -1;
+    if(charToConvert >= '0' && charToConvert <= '9'){ // Only takes whole numbers from 0 - 9, anything that isn't is returned as -1
+        result = charToConvert - '0';
+    }
+    return result;
 }
 
 //--
