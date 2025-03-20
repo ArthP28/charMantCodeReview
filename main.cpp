@@ -14,6 +14,7 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
 
 int findCharAtPosition(const char numString[], char charToFind);
 int charToInt(char charToConvert);
+int wholePlaceValue(int value, int power);
 
 int main()
 {
@@ -79,11 +80,13 @@ int main()
 bool characteristic(const char numString[], int& c)
 {
     //hard coded return value to make the main() work
-    c = 123;
-    int ch = charToInt(numString[0]) + charToInt(numString[1]);
+    //c = 123;
     int locationOfFloatingPoint = findCharAtPosition(numString, '.');
-    cout << ch << endl;
+    int placeValueTest = wholePlaceValue(4, 3);
     // Count from the beginning of the floating point to the largest whole place value
+    for(int i = locationOfFloatingPoint - 1; i >= 0; i--){
+        c += charToInt(numString[i]);
+    }
     return true;
 }
 //--
@@ -112,6 +115,15 @@ int charToInt(char charToConvert){ // Converts a numeric char into an integer
         result = charToConvert - '0';
     }
     return result;
+}
+
+int wholePlaceValue(int value, int power){ // Returns the product of a specific number times 10 raised to a place value
+    // IMPORTANT: 0 = 1 (ones), 1 = 10 (tens), 2 = 100 (hundreds), 3 = 1000 (thousands)
+    int exponent = 1;
+    for(int i = 0; i < power - 1; i++){ // For loop calculates place value exponent, 10 to the (n - 1)th power
+        exponent *= 10;
+    }
+    return value * exponent;
 }
 
 //--
