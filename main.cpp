@@ -12,6 +12,8 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 
+int findCharPosition(const char numString[], char charToFind);
+
 int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
@@ -39,9 +41,9 @@ int main()
     int c2, n2, d2;
 
     //initialize the values
-    c1 = 1;
-    n1 = 1;
-    d1 = 2;
+    c1 = 1; // Characteristic
+    n1 = 1; // Numerator
+    d1 = 2; // Denominator
 
     c2 = 2;
     n2 = 2;
@@ -77,6 +79,7 @@ bool characteristic(const char numString[], int& c)
 {
     //hard coded return value to make the main() work
     c = 123;
+    int sampleFind = findCharPosition(numString, '.');
     return true;
 }
 //--
@@ -87,6 +90,22 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
     denominator = 1000;
     return true;
 }
+
+// ******** MY HELPER FUNCTIONS ********
+
+// Returns the location of a specific character to find. It works like std::find() but it does not require range parameters
+int findCharPosition(const char numString[], char charToFind){
+    int currentPosition = 0;
+    while(numString[currentPosition] != charToFind){
+        if(numString[currentPosition] != '\0'){
+            currentPosition = -1;
+            break;
+        }
+        currentPosition++;
+    }
+    return currentPosition; // Either returns the position of the char if found, or -1 if it cannot be found
+}
+
 //--
 bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
 {

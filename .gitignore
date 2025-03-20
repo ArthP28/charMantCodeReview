@@ -2,3 +2,5 @@
 main
 
 # if necessary, add other entries here
+.vscode/tasks.json
+main.exe
