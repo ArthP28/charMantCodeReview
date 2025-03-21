@@ -12,15 +12,17 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 
+// -- HELPER FUNCTIONS --
 int findCharAtPosition(const char numString[], char charToFind);
 int charToInt(char charToConvert);
 int wholePlaceValue(int value, int power);
+bool isNumericChar(char charToCheck);
 
 int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
     //['1', '2', '3', '.', '4', '5', '6', '\0']
-    const char number[] = "123.456"; 
+    const char number[] = "-12003.456"; 
     int c, n, d;
 
     //if both conversions from c-string to integers can take place
@@ -80,19 +82,27 @@ int main()
 bool characteristic(const char numString[], int& c)
 {
     //hard coded return value to make the main() work
-    //c = 123;
+    c = 0;
+    int numberToAdd = 0;
     int locationOfFloatingPoint = findCharAtPosition(numString, '.');
-    int placeValueTest = wholePlaceValue(4, 3);
+    bool isNegative = false;
     // Count from the beginning of the floating point to the largest whole place value
     for(int i = locationOfFloatingPoint - 1; i >= 0; i--){
-        c += charToInt(numString[i]);
+        if(numString[i] == '-'){ // If the whole number is negative, multiply the whole result by -1
+            c *= -1;
+            break;
+        } else if (numString[i] == '+'){ // If the number starts with a plus sign, nothing happens because the number is positive
+            break;
+        } else if (numString[i] )
+        numberToAdd = charToInt(numString[i]);
+        c += wholePlaceValue(numberToAdd, locationOfFloatingPoint - i - 1); // Add to c the int on the C String raised to its place value
     }
     return true;
 }
 //--
 bool mantissa(const char numString[], int& numerator, int& denominator)
 {
-    //hard coded return value to make the main() work
+    //First find if the floating point exists
     numerator = 456;
     denominator = 1000;
     return true;
@@ -111,7 +121,7 @@ int findCharAtPosition(const char numString[], char charToFind){
 
 int charToInt(char charToConvert){ // Converts a numeric char into an integer
     int result = -1;
-    if(charToConvert >= '0' && charToConvert <= '9'){ // Only takes whole numbers from 0 - 9, anything that isn't is returned as -1
+    if(isNumericChar(charToConvert)){ // Only takes whole numbers from 0 - 9, anything that isn't is returned as -1
         result = charToConvert - '0';
     }
     return result;
@@ -120,10 +130,15 @@ int charToInt(char charToConvert){ // Converts a numeric char into an integer
 int wholePlaceValue(int value, int power){ // Returns the product of a specific number times 10 raised to a place value
     // IMPORTANT: 0 = 1 (ones), 1 = 10 (tens), 2 = 100 (hundreds), 3 = 1000 (thousands)
     int exponent = 1;
-    for(int i = 0; i < power - 1; i++){ // For loop calculates place value exponent, 10 to the (n - 1)th power
+    for(int i = 0; i < power; i++){ // For loop calculates place value exponent, 10 to the nth power
         exponent *= 10;
     }
     return value * exponent;
+}
+
+bool isNumericChar(char charToCheck){
+    // Boolean returns true if the numeric value of a char is between the values of the lowest numeric char and the highest numeric char.
+    return charToCheck >= '0' && charToCheck <= '9';
 }
 
 //--
