@@ -22,7 +22,7 @@ int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
     //['1', '2', '3', '.', '4', '5', '6', '\0']
-    const char number[] = "-12003.456"; 
+    const char number[] = "-120a3.456"; 
     int c, n, d;
 
     //if both conversions from c-string to integers can take place
@@ -81,21 +81,29 @@ int main()
 //--
 bool characteristic(const char numString[], int& c)
 {
-    //hard coded return value to make the main() work
-    c = 0;
-    int numberToAdd = 0;
-    int locationOfFloatingPoint = findCharAtPosition(numString, '.');
-    bool isNegative = false;
+    c = 0; // c is reinitialized to 0 to prevent accidental changes
+    int numberToAdd = 0; // The int that will be converted from the char in the C String
+    int floatingPointLocation = findCharAtPosition(numString, '.'); // The index of the floating point if it exists
     // Count from the beginning of the floating point to the largest whole place value
-    for(int i = locationOfFloatingPoint - 1; i >= 0; i--){
-        if(numString[i] == '-'){ // If the whole number is negative, multiply the whole result by -1
+    for(int i = floatingPointLocation - 1; i >= 0; i--)
+    {
+        if(numString[i] == '-') // If the whole number is negative, multiply the whole result by -1
+        {
             c *= -1;
-            break;
-        } else if (numString[i] == '+'){ // If the number starts with a plus sign, nothing happens because the number is positive
-            break;
-        } else if (numString[i] )
-        numberToAdd = charToInt(numString[i]);
-        c += wholePlaceValue(numberToAdd, locationOfFloatingPoint - i - 1); // Add to c the int on the C String raised to its place value
+        }
+        else if (numString[i] == '+')
+        {
+            // If the number starts with a plus sign, nothing happens because the number is positive. Move onto the next number
+        }
+        else if (isNumericChar(numString[i]))
+        {
+            numberToAdd = charToInt(numString[i]);
+            c += wholePlaceValue(numberToAdd, floatingPointLocation - i - 1); // Add to c the int on the C String raised to its place value
+        }
+        else // If an invalid character is read, return false
+        {
+            return false;
+        }
     }
     return true;
 }
