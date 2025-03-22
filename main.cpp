@@ -17,12 +17,15 @@ int findCharAtPosition(const char numString[], char charToFind);
 int charToInt(char charToConvert);
 int wholePlaceValue(int value, int power);
 bool isNumericChar(char charToCheck);
+int skipTrailingZeroes(const char numString[], int floatPointIndex);
+
+const int MAXIMUM_MANTISSA_PLACE_VALUE = 20;
 
 int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
     //['1', '2', '3', '.', '4', '5', '6', '\0']
-    const char number[] = "-120a3.456"; 
+    const char number[] = "321.00000456"; 
     int c, n, d;
 
     //if both conversions from c-string to integers can take place
@@ -111,6 +114,34 @@ bool characteristic(const char numString[], int& c)
 bool mantissa(const char numString[], int& numerator, int& denominator)
 {
     //First find if the floating point exists
+    int floatingPointLocation = findCharAtPosition(numString, '.');
+    if(floatingPointLocation == '\0') // If it doesn't, the mantissa becomes 0 / 1;
+    {
+        numerator = 0;
+        denominator = 1;
+    }
+    else // If it does, proceed with finding the mantissa
+    {
+        // Go through all trailing zeroes from the floating point until we reach a number that isn't 0
+        // Load up all numbers from the mantissa to a separate C String
+        int positionIndex = skipTrailingZeroes(numString, floatingPointLocation);
+        int maxRange = MAXIMUM_MANTISSA_PLACE_VALUE - positionIndex;
+        char mantissa[MAXIMUM_MANTISSA_PLACE_VALUE];
+        while(positionIndex < maxRange - 1){
+            if(isNumericChar(numString[positionIndex])){
+                mantissa[positionIndex - floatingPointLocation] = numString[positionIndex];
+            } else if (numString[positionIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
+            {
+                break;
+            }
+            else
+            {
+                return false;
+            }
+            positionIndex++;
+        }
+        mantissa[positionIndex] = '\0'; // End C String with null terminator
+    }
     numerator = 456;
     denominator = 1000;
     return true;
@@ -147,6 +178,15 @@ int wholePlaceValue(int value, int power){ // Returns the product of a specific 
 bool isNumericChar(char charToCheck){
     // Boolean returns true if the numeric value of a char is between the values of the lowest numeric char and the highest numeric char.
     return charToCheck >= '0' && charToCheck <= '9';
+}
+
+int skipTrailingZeroes(const char numString[], int floatPointIndex){
+    // Iterates through all trailing zeroes from the floating point until a number that isn't zero is reached
+    int nonZeroIndex = floatPointIndex + 1;
+    while(numString[nonZeroIndex] == '0'){
+        nonZeroIndex++;
+    }
+    return nonZeroIndex; // Then return the index of that nonzero number
 }
 
 //--
