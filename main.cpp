@@ -122,28 +122,33 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
     }
     else // If it does, proceed with finding the mantissa
     {
+        // Step 1: Load up all numbers from the mantissa to a separate C String
+
         // Go through all trailing zeroes from the floating point until we reach a number that isn't 0
-        // Load up all numbers from the mantissa to a separate C String
-        int positionIndex = skipTrailingZeroes(numString, floatingPointLocation);
-        int maxRange = MAXIMUM_MANTISSA_PLACE_VALUE - positionIndex;
+        int nonZeroIndex = skipTrailingZeroes(numString, floatingPointLocation);
+        int maxRange = MAXIMUM_MANTISSA_PLACE_VALUE - nonZeroIndex;
         char mantissa[MAXIMUM_MANTISSA_PLACE_VALUE];
-        while(positionIndex < maxRange - 1){
-            if(isNumericChar(numString[positionIndex])){
-                mantissa[positionIndex - floatingPointLocation] = numString[positionIndex];
-            } else if (numString[positionIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
+        for(int i = 0; i < maxRange; i++){
+            if(isNumericChar(numString[nonZeroIndex])){
+                mantissa[i] = numString[nonZeroIndex];
+            } else if (numString[nonZeroIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
             {
+                maxRange = i;
                 break;
             }
-            else
+            else // If a non-numeric character or null terminator function is found, stop the loop and return false
             {
                 return false;
             }
-            positionIndex++;
+            nonZeroIndex++;
         }
-        mantissa[positionIndex] = '\0'; // End C String with null terminator
+        mantissa[maxRange] = '\0'; // End C String with null terminator (So that is functions like a C String)
+
+        // Step 2: Count backwards from the last number of the mantissa to the first, using the same algorithm as the characteristic
+        
     }
-    numerator = 456;
-    denominator = 1000;
+    //numerator = 456;
+    //denominator = 1000;
     return true;
 }
 
