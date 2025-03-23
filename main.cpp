@@ -46,17 +46,18 @@ int main()
     int c2, n2, d2;
 
     //initialize the values
-    c1 = 2;
-    n1 = 3;
-    d1 = 5;
+    c1 = 1;
+    n1 = 1;
+    d1 = 2;
 
-    c2 = 3;
-    n2 = 4;
-    d2 = 7; 
+    c2 = 2;
+    n2 = 2;
+    d2 = 3; 
 
     //if the c-string can hold at least the characteristic
     if(add(c1, n1, d1, c2, n2, d2, answer, 10))
     {
+        //THIS IS A DIFFERENT ANSWER NOW
         //display string with answer 4.1666666 (cout stops printing at the null terminating character)
         cout<<"Answer: "<<answer<<endl;
     }
@@ -64,6 +65,12 @@ int main()
     {
         //display error message
         cout<<"Error on add"<<endl;
+    }
+
+    if (subtract(c1, n1, d1, c2, n2, d2, answer, 10))
+    {
+        //diplay string with answer 0.8333333
+        cout << "Answer: " << answer << endl;
     }
 
     if(divide(c1, n1, d1, c2, n2, d2, answer, 10))
@@ -108,6 +115,7 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
     //check if denominators are the same
     if (d1 == d2) {
         sumOfMant = n1 + n2;
+        addCharToMant(sumOfChar, sumOfMant, d1, result, len);
     }
     else  { //if here find a way to make denominators equal
         int newDenominator = findCommonDenominator(d1, d2);
@@ -126,9 +134,9 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
             sumOfChar += (sumOfMant / newDenominator);
             sumOfMant = sumOfMant % newDenominator;
         }
- 
-        //format the new c string
+        
         addCharToMant(sumOfChar, sumOfMant, newDenominator, result, len);
+       
     }
 
     return true;
@@ -138,6 +146,15 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 {
     //hard coded return value to make the code compile
     //you will have to come up with an algorithm to subtract the two numbers
+
+    //substract c1 and c2
+    int diffOfChar = c1 - c2;
+    int diffOfMant;
+
+    if (d1 == d2) {
+        diffOfMant = n1 - n2;
+    }
+
     return true;
 }
 //--
@@ -222,8 +239,10 @@ void addCharToMant(int integer, int num, int den, char result[], int len) {
         if (remainder == 0) { //stop here when there isn't any more decimal point numbers
             break;
         }
+
+        index = i;
     }
 
-    result[len - 1] = '\0'; //terminate the string
+    result[index] = '\0'; //terminate the string
     
 }
