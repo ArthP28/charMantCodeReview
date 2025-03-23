@@ -12,6 +12,11 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len);
 
+//helper functions
+int findCommonDenominator(int d1, int d2);
+int gcd(int d1, int d2);
+int lcm(int d1, int d2);
+
 int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
@@ -103,6 +108,19 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
     result[8] = '6';
     result[9] = '\0';
 
+    //add c1 and c2 together 
+    int sumOfChar = c1 + c2;
+    int sumOfMant;
+
+    //check if denominators are the same
+    if (d1 == d2) {
+        sumOfMant = n1 + n2;
+    }
+    else  { //if here find a way to make denominators equal
+        int newDenominator = findCommonDenominator(d1, d2);
+        cout << "The new denominator of " << d1 << " and " << d2 << " is " << newDenominator << endl;
+    }
+
     return true;
 }
 //--
@@ -133,4 +151,27 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
     result[6] = '\0';
     
     return true;
+}
+
+
+//This is the start of my helper functions
+
+int findCommonDenominator(int d1, int d2) {
+   //first we need to find the GCD or greatest common divisor
+    int commDiv = gcd(d1, d2);
+    int commDenom = (d1 / commDiv) * d2;
+
+    //something went wrong
+    return commDenom;
+}
+
+int gcd(int d1, int d2) {
+
+    while (d2 != 0) {
+        int temp = d2;
+        d2 = d1 % d2;
+        d1 = temp;
+    }
+
+    return d1;
 }
