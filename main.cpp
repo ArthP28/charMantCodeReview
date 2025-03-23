@@ -15,7 +15,7 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
 //helper functions
 int findCommonDenominator(int d1, int d2);
 int gcd(int d1, int d2);
-int lcm(int d1, int d2);
+int countDigits(int num);
 
 int main()
 {
@@ -97,16 +97,7 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
 {
     //you will have to come up with an algorithm to add the two numbers
     //hard coded return value to make the main() work
-    result[0] = '4';
-    result[1] = '.';
-    result[2] = '1';
-    result[3] = '6';
-    result[4] = '6';
-    result[5] = '6';
-    result[6] = '6';
-    result[7] = '6';
-    result[8] = '6';
-    result[9] = '\0';
+    
 
     //add c1 and c2 together 
     int sumOfChar = c1 + c2;
@@ -119,6 +110,38 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
     else  { //if here find a way to make denominators equal
         int newDenominator = findCommonDenominator(d1, d2);
         cout << "The new denominator of " << d1 << " and " << d2 << " is " << newDenominator << endl;
+
+        //now update numerators
+        int newN1 = newDenominator / d1;
+        newN1 = newN1 * n1;
+
+        int newN2 = newDenominator / d2;
+        newN2 = newN2 * n2;
+
+        //now add numerators together
+        sumOfMant = newN1 + newN2;
+        if (sumOfMant >= newDenominator) { //check if the fraction is greater than or equal to 1
+            sumOfChar += (sumOfMant / newDenominator);
+            sumOfMant = sumOfMant % newDenominator;
+        }
+
+
+        //now format the c string
+        if (sumOfMant == 0) { //no fraction just a whole number
+            //check how many digits the whole number contains
+            int numDigits = countDigits(sumOfChar);
+            cout << numDigits << endl;
+
+            //add the integer to the c string
+                char digit = '0' + sumOfChar;
+                result[numDigits - 1] = digit;
+                result[numDigits] = '\0';
+            
+        }
+        else {
+
+        }
+        
     }
 
     return true;
@@ -161,7 +184,6 @@ int findCommonDenominator(int d1, int d2) {
     int commDiv = gcd(d1, d2);
     int commDenom = (d1 / commDiv) * d2;
 
-    //something went wrong
     return commDenom;
 }
 
@@ -174,4 +196,18 @@ int gcd(int d1, int d2) {
     }
 
     return d1;
+}
+
+int countDigits(int num) {
+    int count = 0;
+    if (num == 0) {
+        return 1;
+    }
+
+    while (num != 0) { //keep dividing by 10 until num becomes zero
+        num /= 10;
+        count++;
+    }
+
+    return count;
 }
