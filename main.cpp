@@ -16,6 +16,8 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
 int findCommonDenominator(int d1, int d2);
 int gcd(int d1, int d2);
 int countDigits(int num);
+void addCharToMant(int integer, int num, int den, char result[], int len);
+//void fractionToDecimal(int num, int den, char result[], int len);
 
 int main()
 {
@@ -124,24 +126,9 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
             sumOfChar += (sumOfMant / newDenominator);
             sumOfMant = sumOfMant % newDenominator;
         }
-
-
-        //now format the c string
-        if (sumOfMant == 0) { //no fraction just a whole number
-            //check how many digits the whole number contains
-            int numDigits = countDigits(sumOfChar);
-            cout << numDigits << endl;
-
-            //add the integer to the c string
-                char digit = '0' + sumOfChar;
-                result[numDigits - 1] = digit;
-                result[numDigits] = '\0';
-            
-        }
-        else {
-
-        }
-        
+ 
+        //format the new c string
+        addCharToMant(sumOfChar, sumOfMant, newDenominator, result, len);
     }
 
     return true;
@@ -176,7 +163,6 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
     return true;
 }
 
-
 //This is the start of my helper functions
 
 int findCommonDenominator(int d1, int d2) {
@@ -210,4 +196,34 @@ int countDigits(int num) {
     }
 
     return count;
+}
+
+void addCharToMant(int integer, int num, int den, char result[], int len) {
+ 
+    int numDigits = countDigits(integer);
+    int temp = integer;
+    int index = 0;
+
+    for (int i = 0; i < numDigits; i++) {
+        result[i] = '0' + (temp % 10);
+        temp /= 10;
+    }
+    
+    index += numDigits;
+    //add decimal point
+    result[index] = '.';
+    int remainder = num % den;
+
+    for (int i = index + 1; i < len - 1; i++) {
+        remainder *= 10;
+        result[i] = '0' + (remainder / den);
+        remainder %= den;
+
+        if (remainder == 0) { //stop here when there isn't any more decimal point numbers
+            break;
+        }
+    }
+
+    result[len - 1] = '\0'; //terminate the string
+    
 }
