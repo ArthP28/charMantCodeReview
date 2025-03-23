@@ -19,13 +19,13 @@ int wholePlaceValue(int value, int power);
 bool isNumericChar(char charToCheck);
 int skipTrailingZeroes(const char numString[], int floatPointIndex);
 
-const int MAXIMUM_MANTISSA_PLACE_VALUE = 20;
+const int MAXIMUM_MANTISSA_PLACE_VALUE = 10; // Mantissa can only be up to ten digits long. Any mantissa longer than that will have its remaining digits truncated.
 
 int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
     //['1', '2', '3', '.', '4', '5', '6', '\0']
-    const char number[] = "321.00000456"; 
+    const char number[] = "321.456"; 
     int c, n, d;
 
     //if both conversions from c-string to integers can take place
@@ -101,7 +101,7 @@ bool characteristic(const char numString[], int& c)
         else if (isNumericChar(numString[i]))
         {
             numberToAdd = charToInt(numString[i]);
-            c += wholePlaceValue(numberToAdd, floatingPointLocation - i - 1); // Add to c the int on the C String raised to its place value
+            c += wholePlaceValue(numberToAdd, floatingPointLocation - i); // Add to c the int on the C String raised to its place value
         }
         else // If an invalid character is read, return false
         {
@@ -113,9 +113,11 @@ bool characteristic(const char numString[], int& c)
 //--
 bool mantissa(const char numString[], int& numerator, int& denominator)
 {
+    numerator = 0;
+    denominator = 0;
     //First find if the floating point exists
     int floatingPointLocation = findCharAtPosition(numString, '.');
-    if(floatingPointLocation == '\0') // If it doesn't, the mantissa becomes 0 / 1;
+    if(numString[floatingPointLocation] == '\0') // If it doesn't, the mantissa becomes 0 / 1;
     {
         numerator = 0;
         denominator = 1;
@@ -128,10 +130,13 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
         int nonZeroIndex = skipTrailingZeroes(numString, floatingPointLocation);
         int maxRange = MAXIMUM_MANTISSA_PLACE_VALUE - nonZeroIndex;
         char mantissa[MAXIMUM_MANTISSA_PLACE_VALUE];
+        // This variable holds the nonZeroIndex added by the index of the floating point, so that the following loop algorithm finds a mantissa number at the correct location
+        int floatIndex = 0;
         for(int i = 0; i < maxRange; i++){
-            if(isNumericChar(numString[nonZeroIndex])){
-                mantissa[i] = numString[nonZeroIndex];
-            } else if (numString[nonZeroIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
+            floatIndex = nonZeroIndex + floatingPointLocation;
+            if(isNumericChar(numString[floatIndex])){
+                mantissa[i] = numString[floatIndex];
+            } else if (numString[floatIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
             {
                 maxRange = i;
                 break;
@@ -145,10 +150,16 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
         mantissa[maxRange] = '\0'; // End C String with null terminator (So that is functions like a C String)
 
         // Step 2: Count backwards from the last number of the mantissa to the first, using the same algorithm as the characteristic
-        
+        int numberToAdd = 0;
+        for(int i = maxRange - 1; i >= 0; i--){
+            numberToAdd = charToInt(mantissa[i]);
+            numerator += wholePlaceValue(numberToAdd, maxRange - i); // Add to c the int on the C String raised to its place value
+        }
+
+        // Step 3: Calculate the denominator by raising ten to the length of the entire mantissa, including the trailing zeroes
+        int mantissaLength = nonZeroIndex;
+        denominator = wholePlaceValue(1, mantissaLength);
     }
-    //numerator = 456;
-    //denominator = 1000;
     return true;
 }
 
@@ -173,11 +184,13 @@ int charToInt(char charToConvert){ // Converts a numeric char into an integer
 
 int wholePlaceValue(int value, int power){ // Returns the product of a specific number times 10 raised to a place value
     // IMPORTANT: 0 = 1 (ones), 1 = 10 (tens), 2 = 100 (hundreds), 3 = 1000 (thousands)
+    int result = 0;
     int exponent = 1;
-    for(int i = 0; i < power; i++){ // For loop calculates place value exponent, 10 to the nth power
+    for(int i = 0; i < power - 1; i++){ // For loop calculates place value exponent, 10 to the nth power
         exponent *= 10;
     }
-    return value * exponent;
+    result = value * exponent;
+    return result;
 }
 
 bool isNumericChar(char charToCheck){
@@ -191,7 +204,7 @@ int skipTrailingZeroes(const char numString[], int floatPointIndex){
     while(numString[nonZeroIndex] == '0'){
         nonZeroIndex++;
     }
-    return nonZeroIndex; // Then return the index of that nonzero number
+    return nonZeroIndex - floatPointIndex; // Then return the index of that nonzero number in the mantissa
 }
 
 //--
