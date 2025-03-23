@@ -25,7 +25,7 @@ int main()
 {
     //this c-string, or array of 8 characters, ends with the null terminating character '\0'
     //['1', '2', '3', '.', '4', '5', '6', '\0']
-    const char number[] = "321.456"; 
+    const char number[] = "123.456"; 
     int c, n, d;
 
     //if both conversions from c-string to integers can take place
