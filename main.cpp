@@ -46,13 +46,13 @@ int main()
     int c2, n2, d2;
 
     //initialize the values
-    c1 = 1;
-    n1 = 1;
-    d1 = 2;
+    c1 = 2;
+    n1 = 3;
+    d1 = 5;
 
-    c2 = 2;
-    n2 = 2;
-    d2 = 3; 
+    c2 = 3;
+    n2 = 4;
+    d2 = 7; 
 
     //if the c-string can hold at least the characteristic
     if(add(c1, n1, d1, c2, n2, d2, answer, 10))
