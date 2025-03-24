@@ -17,6 +17,7 @@ int findCommonDenominator(int d1, int d2);
 int gcd(int d1, int d2);
 int countDigits(int num);
 void addCharToMant(int integer, int num, int den, char result[], int len);
+void addTester();
 //void fractionToDecimal(int num, int den, char result[], int len);
 
 int main()
@@ -84,6 +85,8 @@ int main()
         cout<<"Error on divide"<<endl;
     }
 
+    addTester();
+
     return 0;
 } 
 //--
@@ -119,7 +122,7 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
     }
     else  { //if here find a way to make denominators equal
         int newDenominator = findCommonDenominator(d1, d2);
-        cout << "The new denominator of " << d1 << " and " << d2 << " is " << newDenominator << endl;
+        //cout << "The new denominator of " << d1 << " and " << d2 << " is " << newDenominator << endl;
 
         //now update numerators
         int newN1 = newDenominator / d1;
@@ -227,22 +230,71 @@ void addCharToMant(int integer, int num, int den, char result[], int len) {
     }
     
     index += numDigits;
-    //add decimal point
-    result[index] = '.';
-    int remainder = num % den;
 
-    for (int i = index + 1; i < len - 1; i++) {
+    //add decimal point
+    result[index++] = '.';
+    int remainder = num % den;
+    int count = index;
+
+    for (int i = count; i < len - 1; i++) {
         remainder *= 10;
         result[i] = '0' + (remainder / den);
         remainder %= den;
+        index++;
 
         if (remainder == 0) { //stop here when there isn't any more decimal point numbers
             break;
         }
 
-        index = i;
     }
-
+   
     result[index] = '\0'; //terminate the string
     
 }
+
+void addTester() {
+
+    char result[10];
+    int c1 = 1;
+    int n1 = 4;
+    int d1 = 5;
+
+    int c2 = 5;
+    int n2 = 1;
+    int d2 = 4;
+
+    //1.8 + 5.25 = 7.05
+    add(c1, n1, d1, c2, n2, d2, result, 10);
+
+    cout << "Result: " << result <<  " and should be: 7.05" << endl;
+
+    char result1[10];
+    c1 = 2;
+    n1 = 3;
+    d1 = 7;
+
+    c2 = 2;
+    n2 = 2;
+    d2 = 7;
+
+    //2.42857142857 + 2.28571428571 = 4.7142857
+    add(c1, n1, d1, c2, n2, d2, result1, 10);
+
+    cout << "Result: " << result1 << " and should be: 4.7142857" << endl;
+
+    //2.66666666 + 3.46 = 6.12666666
+
+    char result2[10];
+    c1 = 2;
+    n1 = 2;
+    d1 = 3;
+
+    c2 = 3;
+    n2 = 23;
+    d2 = 50;
+
+    add(c1, n1, d1, c2, n2, d2, result2, 10);
+    cout << "Result: " << result2 << " and should be: 6.126666666" << endl;
+}
+
+
