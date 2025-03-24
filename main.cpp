@@ -18,6 +18,7 @@ int gcd(int d1, int d2);
 int countDigits(int num);
 void addCharToMant(int integer, int num, int den, char result[], int len);
 void addTester();
+void subtractTester();
 //void fractionToDecimal(int num, int den, char result[], int len);
 
 int main()
@@ -47,20 +48,20 @@ int main()
     int c2, n2, d2;
 
     //initialize the values
-    c1 = 1;
-    n1 = 1;
-    d1 = 2;
+    c1 = 2;
+    n1 = 2;
+    d1 = 3;
 
-    c2 = 2;
-    n2 = 2;
-    d2 = 3; 
+    c2 = 1;
+    n2 = 1;
+    d2 = 2; 
 
     //if the c-string can hold at least the characteristic
     if(add(c1, n1, d1, c2, n2, d2, answer, 10))
     {
         //THIS IS A DIFFERENT ANSWER NOW
         //display string with answer 4.1666666 (cout stops printing at the null terminating character)
-        cout<<"Answer: "<<answer<<endl;
+        cout<<"Answer for add: "<<answer<<endl;
     }
     else
     {
@@ -71,13 +72,18 @@ int main()
     if (subtract(c1, n1, d1, c2, n2, d2, answer, 10))
     {
         //diplay string with answer 0.8333333
-        cout << "Answer: " << answer << endl;
+        cout << "Answer for subtract: " << answer << endl;
+    }
+    else
+    {
+        //display error message
+        cout << "Error on subtract" << endl;
     }
 
     if(divide(c1, n1, d1, c2, n2, d2, answer, 10))
     {
         //display string with answer
-        cout<<"Answer: "<<answer<<endl;
+        cout<<"Answer on divide: "<<answer<<endl;
     }
     else
     {
@@ -85,7 +91,8 @@ int main()
         cout<<"Error on divide"<<endl;
     }
 
-    addTester();
+   // addTester();
+    subtractTester();
 
     return 0;
 } 
@@ -110,7 +117,6 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
     //you will have to come up with an algorithm to add the two numbers
     //hard coded return value to make the main() work
     
-
     //add c1 and c2 together 
     int sumOfChar = c1 + c2;
     int sumOfMant;
@@ -156,6 +162,21 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 
     if (d1 == d2) {
         diffOfMant = n1 - n2;
+    } 
+    else { //find common denominator
+        int newDenominator = findCommonDenominator(d1, d2);
+
+        //update numerators
+        int newN1 = newDenominator / d1;
+        newN1 *= n1;
+        int newN2 = newDenominator / d2;
+        newN2 *= n2;
+
+        //subtract numerators
+        if(newN1)
+        diffOfMant = newN1 - newN2;
+
+        addCharToMant(diffOfChar, diffOfMant, newDenominator, result, len);
     }
 
     return true;
@@ -297,4 +318,35 @@ void addTester() {
     cout << "Result: " << result2 << " and should be: 6.126666666" << endl;
 }
 
+void subtractTester() {
 
+    char result[10];
+    int c1 = 10;
+    int n1 = 2;
+    int d1 = 3;
+
+    int c2 = 4;
+    int n2 = 3;
+    int d2 = 8;
+
+    //10.6666666 - 4.375 = 6.291666
+    subtract(c1, n1, d1, c2, n2, d2, result, 10);
+    cout << "Result: " << result << endl;
+    
+    char result1[10];
+    c1 = 3;
+    n1 = 5;
+    d1 = 7;
+
+    c2 = 4;
+    n2 = 1;
+    d2 = 3;
+
+    //3.71428571 - 4.3333333333 = -0.61904759
+    subtract(c1, n1, d1, c2, n2, d2, result1, 10);
+    cout << "Result: " << result1 << endl;
+
+
+
+
+}
