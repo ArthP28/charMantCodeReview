@@ -16,10 +16,10 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
 int findCommonDenominator(int d1, int d2);
 int gcd(int d1, int d2);
 int countDigits(int num);
-void addCharToMant(int integer, int num, int den, char result[], int len);
+void addCharToMant(int integer, int num, int den, char result[], int len, bool isPos);
 void addTester();
 void subtractTester();
-//void fractionToDecimal(int num, int den, char result[], int len);
+void multiplyTester();
 
 int main()
 {
@@ -69,17 +69,6 @@ int main()
         cout<<"Error on add"<<endl;
     }
 
-    if (subtract(c1, n1, d1, c2, n2, d2, answer, 10))
-    {
-        //diplay string with answer 0.8333333
-        cout << "Answer for subtract: " << answer << endl;
-    }
-    else
-    {
-        //display error message
-        cout << "Error on subtract" << endl;
-    }
-
     if(divide(c1, n1, d1, c2, n2, d2, answer, 10))
     {
         //display string with answer
@@ -91,8 +80,9 @@ int main()
         cout<<"Error on divide"<<endl;
     }
 
-   // addTester();
-    subtractTester();
+     //addTester();
+    //subtractTester();
+    multiplyTester();
 
     return 0;
 } 
@@ -124,7 +114,7 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
     //check if denominators are the same
     if (d1 == d2) {
         sumOfMant = n1 + n2;
-        addCharToMant(sumOfChar, sumOfMant, d1, result, len);
+        addCharToMant(sumOfChar, sumOfMant, d1, result, len, true);
     }
     else  { //if here find a way to make denominators equal
         int newDenominator = findCommonDenominator(d1, d2);
@@ -144,7 +134,7 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
             sumOfMant = sumOfMant % newDenominator;
         }
         
-        addCharToMant(sumOfChar, sumOfMant, newDenominator, result, len);
+        addCharToMant(sumOfChar, sumOfMant, newDenominator, result, len, true);
        
     }
 
@@ -156,28 +146,32 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
     //hard coded return value to make the code compile
     //you will have to come up with an algorithm to subtract the two numbers
 
-    //substract c1 and c2
-    int diffOfChar = c1 - c2;
+    int diffOfChar;
     int diffOfMant;
+    bool isPos = true;
 
-    if (d1 == d2) {
-        diffOfMant = n1 - n2;
-    } 
-    else { //find common denominator
-        int newDenominator = findCommonDenominator(d1, d2);
+    int newDenominator = findCommonDenominator(d1, d2);
 
-        //update numerators
-        int newN1 = newDenominator / d1;
-        newN1 *= n1;
-        int newN2 = newDenominator / d2;
-        newN2 *= n2;
+    int newN1 = newDenominator / d1;
+    newN1 *= n1;
+    int newN2 = newDenominator / d2;
+    newN2 *= n2;
 
-        //subtract numerators
-        if(newN1)
-        diffOfMant = newN1 - newN2;
+    int newChar1 = (c1 * newDenominator) + newN1;
+    int newChar2 = (c2 * newDenominator) + newN2;
 
-        addCharToMant(diffOfChar, diffOfMant, newDenominator, result, len);
+    int diff = newChar1 - newChar2;
+
+    if (diff < 0) { //the number is negative
+        isPos = false;
+        diff *= -1;
     }
+
+    int whole = diff / newDenominator;
+    int remainder = (diff % newDenominator);
+    
+    addCharToMant(whole, remainder, newDenominator, result, len, isPos);
+
 
     return true;
 }
@@ -186,6 +180,19 @@ bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 {
     //hard coded return value to make the code compile
     //you will have to come up with an algorithm to multiply the two numbers
+    //mutiple whole numbers
+    int newN1 = (c1 * d1) + n1;
+    int newN2 = (c2 * d2) + n2;
+    int newDenom = d1 * d2;
+
+    int product = newN1 * newN2;
+
+    int whole = product / newDenom;
+    int remainder = product % newDenom;
+   
+
+    addCharToMant(whole, remainder, newDenom, result, len, true);
+
     return true;
 }
 //--
@@ -239,14 +246,19 @@ int countDigits(int num) {
     return count;
 }
 
-void addCharToMant(int integer, int num, int den, char result[], int len) {
- 
+void addCharToMant(int integer, int num, int den, char result[], int len, bool isPos) {
+    
+    int index = 0;
     int numDigits = countDigits(integer);
     int temp = integer;
-    int index = 0;
+
+    if (isPos == false) {
+        result[0] = '-';
+        index++;
+    }
 
     for (int i = 0; i < numDigits; i++) {
-        result[i] = '0' + (temp % 10);
+        result[index + i] = '0' + (temp % 10);
         temp /= 10;
     }
     
@@ -287,7 +299,7 @@ void addTester() {
     //1.8 + 5.25 = 7.05
     add(c1, n1, d1, c2, n2, d2, result, 10);
 
-    cout << "Result: " << result <<  " and should be: 7.05" << endl;
+    cout << "Result: " << result << endl;
 
     char result1[10];
     c1 = 2;
@@ -301,7 +313,7 @@ void addTester() {
     //2.42857142857 + 2.28571428571 = 4.7142857
     add(c1, n1, d1, c2, n2, d2, result1, 10);
 
-    cout << "Result: " << result1 << " and should be: 4.7142857" << endl;
+    cout << "Result: " << result1 << endl;
 
     //2.66666666 + 3.46 = 6.12666666
 
@@ -315,7 +327,7 @@ void addTester() {
     d2 = 50;
 
     add(c1, n1, d1, c2, n2, d2, result2, 10);
-    cout << "Result: " << result2 << " and should be: 6.126666666" << endl;
+    cout << "Result: " << result2 << endl;
 }
 
 void subtractTester() {
@@ -346,7 +358,33 @@ void subtractTester() {
     subtract(c1, n1, d1, c2, n2, d2, result1, 10);
     cout << "Result: " << result1 << endl;
 
+    char result2[10];
+    c1 = 4;
+    n1 = 3;
+    d1 = 4;
 
+    c2 = 5;
+    n2 = 1;
+    d2 = 5;
 
+    //4.75 - 5.20 = -0.45
+    subtract(c1, n1, d1, c2, n2, d2, result2, 10);
+    cout << "Result: " << result2 << endl;
+
+}
+
+void multiplyTester() {
+    char result[10];
+    int c1 = 2;
+    int n1 = 1;
+    int d1 = 2;
+
+    int c2 = 3;
+    int n2 = 2;
+    int d2 = 3;
+
+    //2 * 3.66666666
+    multiply(c1, n1, d1, c2, n2, d2, result, 10);
+    cout << "Result:" << result << endl;
 
 }
