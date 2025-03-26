@@ -20,6 +20,7 @@ void addCharToMant(int integer, int num, int den, char result[], int len, bool i
 void addTester();
 void subtractTester();
 void multiplyTester();
+void divideTester();
 
 int main()
 {
@@ -82,7 +83,8 @@ int main()
 
      //addTester();
     //subtractTester();
-    multiplyTester();
+    //multiplyTester();
+    divideTester();
 
     return 0;
 } 
@@ -106,39 +108,27 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
 {
     //you will have to come up with an algorithm to add the two numbers
     //hard coded return value to make the main() work
-    
-    //add c1 and c2 together 
-    int sumOfChar = c1 + c2;
-    int sumOfMant;
+    //find common denominators
+    int newDenom = findCommonDenominator(d1, d2);
 
-    //check if denominators are the same
-    if (d1 == d2) {
-        sumOfMant = n1 + n2;
-        addCharToMant(sumOfChar, sumOfMant, d1, result, len, true);
-    }
-    else  { //if here find a way to make denominators equal
-        int newDenominator = findCommonDenominator(d1, d2);
-        //cout << "The new denominator of " << d1 << " and " << d2 << " is " << newDenominator << endl;
+    //update numerators 
+    int newN1 = n1 * (newDenom / d1);
+    int newN2 = n2 * (newDenom / d2);
 
-        //now update numerators
-        int newN1 = newDenominator / d1;
-        newN1 = newN1 * n1;
+    //mutiply c1 and c2 by new denominator and combine with current numerator
+    newN1 += c1 * newDenom;
+    newN2 += c2 * newDenom;
 
-        int newN2 = newDenominator / d2;
-        newN2 = newN2 * n2;
+    //add newN1 and newN2 togther
+    int sum = newN1 + newN2;
 
-        //now add numerators together
-        sumOfMant = newN1 + newN2;
-        if (sumOfMant >= newDenominator) { //check if the fraction is greater than or equal to 1
-            sumOfChar += (sumOfMant / newDenominator);
-            sumOfMant = sumOfMant % newDenominator;
-        }
-        
-        addCharToMant(sumOfChar, sumOfMant, newDenominator, result, len, true);
+    //split back into a fraction
+    int whole = sum / newDenom;
+    int remainder = sum % newDenom;
+
+   addCharToMant(whole, remainder, newDenom, result, len, true);
        
-    }
-
-    return true;
+   return true;
 }
 //--
 bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
@@ -180,7 +170,20 @@ bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 {
     //hard coded return value to make the code compile
     //you will have to come up with an algorithm to multiply the two numbers
-    //mutiple whole numbers
+    bool isPos = true;
+    if (c1 < 0) {
+        c1 *= -1;
+        isPos = false;
+    }
+    if (c2 < 0) {
+        c2 *= -1;
+        isPos = false;
+    }
+    else if (c2 && c1 < 0) {
+        c1 *= -1;
+        c2 *= -1;
+    }
+   
     int newN1 = (c1 * d1) + n1;
     int newN2 = (c2 * d2) + n2;
     int newDenom = d1 * d2;
@@ -190,8 +193,7 @@ bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
     int whole = product / newDenom;
     int remainder = product % newDenom;
    
-
-    addCharToMant(whole, remainder, newDenom, result, len, true);
+    addCharToMant(whole, remainder, newDenom, result, len, isPos);
 
     return true;
 }
@@ -200,14 +202,33 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
 {
     //you will have to come up with an algorithm to divide the two numbers
     //hard coded return value to make the main() work
-    result[0] = '0';
-    result[1] = '.';
-    result[2] = '5';
-    result[3] = '6';
-    result[4] = '2';
-    result[5] = '5';
-    result[6] = '\0';
-    
+    //set this equal to true unless a negative number is entered
+    bool isPos = true;
+    if (c1 < 0) {
+        c1 *= -1;
+        isPos = false;
+    }
+    else if (c2 < 0) {
+        c2 *= -1;
+        isPos = false;
+    }
+    else if (c2 && c1 < 0) {
+        c1 *= -1;
+        c2 *= -1;
+    }
+
+    int newN1 = (c1 * d1) + n1;
+    int newN2 = (c2 * d2) + n2;
+
+    //now multiply the first fraction by the reciprocal of the second
+    int product1 = newN1 * d2;
+    int product2 = newN2 * d1;
+
+    int whole = product1 / product2;
+    int remainder = product1 % product2;
+
+    addCharToMant(whole, remainder, product2, result, len, isPos);
+
     return true;
 }
 
@@ -300,7 +321,7 @@ void addTester() {
     //1.8 + 5.25 = 7.05
     add(c1, n1, d1, c2, n2, d2, result, 10);
 
-    cout << "Result: " << result << endl;
+    cout << "Result on add(): " << result << endl;
 
     char result1[10];
     c1 = 2;
@@ -314,7 +335,7 @@ void addTester() {
     //2.42857142857 + 2.28571428571 = 4.7142857
     add(c1, n1, d1, c2, n2, d2, result1, 10);
 
-    cout << "Result: " << result1 << endl;
+    cout << "Result on add(): " << result1 << endl;
 
     //2.66666666 + 3.46 = 6.12666666
 
@@ -328,7 +349,7 @@ void addTester() {
     d2 = 50;
 
     add(c1, n1, d1, c2, n2, d2, result2, 10);
-    cout << "Result: " << result2 << endl;
+    cout << "Result on add(): " << result2 << endl;
 }
 
 void subtractTester() {
@@ -344,7 +365,7 @@ void subtractTester() {
 
     //10.6666666 - 4.375 = 6.291666
     subtract(c1, n1, d1, c2, n2, d2, result, 10);
-    cout << "Result: " << result << endl;
+    cout << "Result on subtract(): " << result << endl;
     
     char result1[10];
     c1 = 3;
@@ -357,7 +378,7 @@ void subtractTester() {
 
     //3.71428571 - 4.3333333333 = -0.61904759
     subtract(c1, n1, d1, c2, n2, d2, result1, 10);
-    cout << "Result: " << result1 << endl;
+    cout << "Result on subtract(): " << result1 << endl;
 
     char result2[10];
     c1 = 4;
@@ -370,13 +391,13 @@ void subtractTester() {
 
     //4.75 - 5.20 = -0.45
     subtract(c1, n1, d1, c2, n2, d2, result2, 10);
-    cout << "Result: " << result2 << endl;
+    cout << "Result on subtract(): " << result2 << endl;
 
 }
 
 void multiplyTester() {
     char result[10];
-    int c1 = 2;
+    int c1 = -2;
     int n1 = 1;
     int d1 = 2;
 
@@ -384,9 +405,9 @@ void multiplyTester() {
     int n2 = 2;
     int d2 = 3;
 
-    //2.5 * 3.66666666 = 9.166666666
+    //2.5 * 3.66666666 = -9.166666666
     multiply(c1, n1, d1, c2, n2, d2, result, 10);
-    cout << "Result:" << result << endl;
+    cout << "Result on multiply():" << result << endl;
 
     char result1[10];
     c1 = 30;
@@ -399,7 +420,7 @@ void multiplyTester() {
 
     //30.8 * 4.66666666 = 143.73333333
     multiply(c1, n1, d1, c2, n2, d2, result1, 10);
-    cout << "Result:" << result1 << endl;
+    cout << "Result on multiply():" << result1 << endl;
 
     char result2[10];
     c1 = 5;
@@ -412,6 +433,47 @@ void multiplyTester() {
 
     //5.1111111 * 2.6 = 13.2888888888
     multiply(c1, n1, d1, c2, n2, d2, result2, 10);
-    cout << "Result:" << result2 << endl;
+    cout << "Result on multiply():" << result2 << endl;
 
+}
+
+void divideTester() {
+    char result[10];
+    int c1 = 4;
+    int n1 = 1;
+    int d1 = 4;
+
+    int c2 = 3;
+    int n2 = 1;
+    int d2 = 6;
+    
+    //4.25 / 3.16666666 = 1.34210529
+    divide(c1, n1, d1, c2, n2, d2, result, 10);
+    cout << "Results on divide(): " << result << endl;
+
+    char result1[10];
+    c1 = -1;
+    n1 = 2;
+    d1 = 3;
+
+    c2 = 2;
+    n2 = 3;
+    d2 = 4;
+
+    //-1.666666 / 2.75 = -0.606060364
+    divide(c1, n1, d1, c2, n2, d2, result1, 10);
+    cout << "Results on divide():" << result1 << endl;
+
+    char result2[10];
+    c1 = 7;
+    n1 = 1;
+    d1 = 3;
+
+    c2 = 2;
+    n2 = 5;
+    d2 = 6;
+
+    //7.333333 / 2.8333333 = 2.58823521
+    divide(c1, n1, d1, c2, n2, d2, result2, 10);
+    cout << "Results on divide():" << result2 << endl;
 }
