@@ -81,9 +81,9 @@ int main()
         cout<<"Error on divide"<<endl;
     }
 
-     //addTester();
-    //subtractTester();
-    //multiplyTester();
+     addTester();
+    subtractTester();
+    multiplyTester();
     divideTester();
 
     return 0;
@@ -245,6 +245,7 @@ int findCommonDenominator(int d1, int d2) {
 int gcd(int d1, int d2) {
 
     while (d2 != 0) {
+        //Using the Euclidean Algorithm
         int temp = d2;
         d2 = d1 % d2;
         d1 = temp;
@@ -277,7 +278,6 @@ void addCharToMant(int integer, int num, int den, char result[], int len, bool i
         result[index++] = '-';
     }
 
-    //start from the back and iterate down the integer
     int startIndex = index + numDigits - 1;
     for (int i = startIndex; i >= index; i--) {
         result[i] = '0' + (temp % 10);
@@ -288,16 +288,15 @@ void addCharToMant(int integer, int num, int den, char result[], int len, bool i
 
     //add decimal point
     result[index++] = '.';
-    int remainder = num % den;
-    int count = index;
 
-    for (int i = count; i < len - 1; i++) {
-        remainder *= 10;
-        result[i] = '0' + (remainder / den);
-        remainder %= den;
+
+    for (int i = index; i < len - 1; i++) {
+        num *= 10;
+        result[i] = '0' + (num / den);
+        num %= den;
         index++;
 
-        if (remainder == 0) { //stop here when there isn't any more decimal point numbers
+        if (num == 0) { //stop here when there isn't any more decimal point numbers
             break;
         }
 
