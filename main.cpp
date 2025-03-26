@@ -253,12 +253,13 @@ void addCharToMant(int integer, int num, int den, char result[], int len, bool i
     int temp = integer;
 
     if (isPos == false) {
-        result[0] = '-';
-        index++;
+        result[index++] = '-';
     }
 
-    for (int i = 0; i < numDigits; i++) {
-        result[index + i] = '0' + (temp % 10);
+    //start from the back and iterate down the integer
+    int startIndex = index + numDigits - 1;
+    for (int i = startIndex; i >= index; i--) {
+        result[i] = '0' + (temp % 10);
         temp /= 10;
     }
     
@@ -383,8 +384,34 @@ void multiplyTester() {
     int n2 = 2;
     int d2 = 3;
 
-    //2 * 3.66666666
+    //2.5 * 3.66666666 = 9.166666666
     multiply(c1, n1, d1, c2, n2, d2, result, 10);
     cout << "Result:" << result << endl;
+
+    char result1[10];
+    c1 = 30;
+    n1 = 4;
+    d1 = 5;
+
+    c2 = 4;
+    n2 = 2;
+    d2 = 3;
+
+    //30.8 * 4.66666666 = 143.73333333
+    multiply(c1, n1, d1, c2, n2, d2, result1, 10);
+    cout << "Result:" << result1 << endl;
+
+    char result2[10];
+    c1 = 5;
+    n1 = 1;
+    d1 = 9;
+
+    c2 = 2;
+    n2 = 3;
+    d2 = 5;
+
+    //5.1111111 * 2.6 = 13.2888888888
+    multiply(c1, n1, d1, c2, n2, d2, result2, 10);
+    cout << "Result:" << result2 << endl;
 
 }
