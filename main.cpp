@@ -21,6 +21,7 @@ void addTester();
 void subtractTester();
 void multiplyTester();
 void divideTester();
+void checkCharacteristics(bool& isPos, int& c1, int& c2);
 
 int main()
 {
@@ -108,25 +109,27 @@ bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
 {
     //you will have to come up with an algorithm to add the two numbers
     //hard coded return value to make the main() work
+    
     //find common denominators
-    int newDenom = findCommonDenominator(d1, d2);
+    int newDenominator = findCommonDenominator(d1, d2);
 
     //update numerators 
-    int newN1 = n1 * (newDenom / d1);
-    int newN2 = n2 * (newDenom / d2);
+    int newNumerator1 = n1 * (newDenominator / d1);
+    int newNumerator2 = n2 * (newDenominator / d2);
 
     //mutiply c1 and c2 by new denominator and combine with current numerator
-    newN1 += c1 * newDenom;
-    newN2 += c2 * newDenom;
+    newNumerator1 += c1 * newDenominator;
+    newNumerator2 += c2 * newDenominator;
 
-    //add newN1 and newN2 togther
-    int sum = newN1 + newN2;
+    //add newNumerator1 and newNumerator2 togther
+    int sum = newNumerator1 + newNumerator2;
 
-    //split back into a fraction
-    int whole = sum / newDenom;
-    int remainder = sum % newDenom;
+    //turn back into a mixed number
+    int whole = sum / newDenominator;
+    int remainder = sum % newDenominator;
+    
 
-   addCharToMant(whole, remainder, newDenom, result, len, true);
+    addCharToMant(whole, remainder, newDenominator, result, len, true);
        
    return true;
 }
@@ -136,27 +139,31 @@ bool subtract(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
     //hard coded return value to make the code compile
     //you will have to come up with an algorithm to subtract the two numbers
 
-    int diffOfChar;
-    int diffOfMant;
     bool isPos = true;
 
+    //find common denominator
     int newDenominator = findCommonDenominator(d1, d2);
 
-    int newN1 = newDenominator / d1;
-    newN1 *= n1;
-    int newN2 = newDenominator / d2;
-    newN2 *= n2;
+    //update numerator based on new denominator
+    int newNumerator1 = newDenominator / d1;
+    newNumerator1 *= n1;
+    int newNumerator2 = newDenominator / d2;
+    newNumerator2 *= n2;
 
-    int newChar1 = (c1 * newDenominator) + newN1;
-    int newChar2 = (c2 * newDenominator) + newN2;
+    //turn into an improper fraction
+    int newCharacteristic1 = (c1 * newDenominator) + newNumerator1;
+    int newCharacteristic2 = (c2 * newDenominator) + newNumerator2;
 
-    int diff = newChar1 - newChar2;
+    //subtract new numerators by each other
+    int diff = newCharacteristic1 - newCharacteristic2;
+    
 
-    if (diff < 0) { //the number is negative
+    if (diff < 0) { //the number is negative, set it to positive and set isPos to false
         isPos = false;
         diff *= -1;
     }
 
+    //turn back into a mixed number
     int whole = diff / newDenominator;
     int remainder = (diff % newDenominator);
     
@@ -170,30 +177,23 @@ bool multiply(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int
 {
     //hard coded return value to make the code compile
     //you will have to come up with an algorithm to multiply the two numbers
+    
     bool isPos = true;
-    if (c1 < 0) {
-        c1 *= -1;
-        isPos = false;
-    }
-    if (c2 < 0) {
-        c2 *= -1;
-        isPos = false;
-    }
-    else if (c2 && c1 < 0) {
-        c1 *= -1;
-        c2 *= -1;
-    }
-   
-    int newN1 = (c1 * d1) + n1;
-    int newN2 = (c2 * d2) + n2;
-    int newDenom = d1 * d2;
+    checkCharacteristics(isPos, c1, c2);
 
-    int product = newN1 * newN2;
+    //turn into a improper fraction
+    int newNumerator1 = (c1 * d1) + n1;
+    int newNumerator2 = (c2 * d2) + n2;
+    int newDenominator = d1 * d2;
 
-    int whole = product / newDenom;
-    int remainder = product % newDenom;
+    //multiply numerators
+    int product = newNumerator1 * newNumerator2;
+
+    //turn back into a mixed number
+    int whole = product / newDenominator;
+    int remainder = product % newDenominator;
    
-    addCharToMant(whole, remainder, newDenom, result, len, isPos);
+    addCharToMant(whole, remainder, newDenominator, result, len, isPos);
 
     return true;
 }
@@ -202,8 +202,31 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
 {
     //you will have to come up with an algorithm to divide the two numbers
     //hard coded return value to make the main() work
-    //set this equal to true unless a negative number is entered
     bool isPos = true;
+    checkCharacteristics(isPos, c1, c2);
+
+    int newN1 = (c1 * d1) + n1;
+    int newN2 = (c2 * d2) + n2;
+
+    //now multiply the first fraction by the reciprocal of the second
+    int product1 = newN1 * d2;
+    int product2 = newN2 * d1;
+
+    //turn back into a mixed number
+    int whole = product1 / product2;
+    int remainder = product1 % product2;
+
+    addCharToMant(whole, remainder, product2, result, len, isPos);
+
+    return true;
+}
+
+//This is the start of my helper functions
+
+void checkCharacteristics(bool& isPos, int& c1, int& c2) {
+    //check to see if one or both numbers entered are negative
+    //if one is then the product is negative and we cleanse the value
+    //if both are then the product is still positive but we still need to cleanse the value
     if (c1 < 0) {
         c1 *= -1;
         isPos = false;
@@ -216,23 +239,7 @@ bool divide(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int l
         c1 *= -1;
         c2 *= -1;
     }
-
-    int newN1 = (c1 * d1) + n1;
-    int newN2 = (c2 * d2) + n2;
-
-    //now multiply the first fraction by the reciprocal of the second
-    int product1 = newN1 * d2;
-    int product2 = newN2 * d1;
-
-    int whole = product1 / product2;
-    int remainder = product1 % product2;
-
-    addCharToMant(whole, remainder, product2, result, len, isPos);
-
-    return true;
 }
-
-//This is the start of my helper functions
 
 int findCommonDenominator(int d1, int d2) {
    //first we need to find the GCD or greatest common divisor
@@ -246,6 +253,9 @@ int gcd(int d1, int d2) {
 
     while (d2 != 0) {
         //Using the Euclidean Algorithm
+        //by repeatledy finding the remainder of the two denominators
+        //then updating the two values with the remainder and dividend
+        //eventually the remainder becomes zero and the quotient becomes the GCD
         int temp = d2;
         d2 = d1 % d2;
         d1 = temp;
@@ -255,6 +265,7 @@ int gcd(int d1, int d2) {
 }
 
 int countDigits(int num) {
+    //counts the amount of digits a integer has and returns that number
     int count = 0;
     if (num == 0) {
         return 1;
@@ -269,21 +280,26 @@ int countDigits(int num) {
 }
 
 void addCharToMant(int integer, int num, int den, char result[], int len, bool isPos) {
+    //this function takes a characteristic and mantissa, 2 3/4
+    //then adds them together to make a floating point number
     
     int index = 0;
     int numDigits = countDigits(integer);
     int temp = integer;
 
+    //if number is negative add - 
     if (isPos == false) {
         result[index++] = '-';
     }
-
+    
+    //start from the back of the integer or before decimal point
     int startIndex = index + numDigits - 1;
     for (int i = startIndex; i >= index; i--) {
         result[i] = '0' + (temp % 10);
         temp /= 10;
     }
     
+    //update index
     index += numDigits;
 
     //add decimal point
@@ -291,12 +307,19 @@ void addCharToMant(int integer, int num, int den, char result[], int len, bool i
 
 
     for (int i = index; i < len - 1; i++) {
+        //move decimal point over one place
         num *= 10;
+
+        //use long division
+        //add whole number to mantissa
+        //remainder replaces num
         result[i] = '0' + (num / den);
         num %= den;
+
+        //increase index so that we can correctly terminate string at the end
         index++;
 
-        if (num == 0) { //stop here when there isn't any more decimal point numbers
+        if (num == 0) { //stop here when there isn't any more numbers to divide
             break;
         }
 
