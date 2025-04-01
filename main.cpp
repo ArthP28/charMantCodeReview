@@ -19,28 +19,17 @@ int wholePlaceValue(int value, int power);
 bool isNumericChar(char charToCheck);
 int skipTrailingZeroes(const char numString[], int floatPointIndex);
 
-const int MAXIMUM_MANTISSA_PLACE_VALUE = 10; // Mantissa can only be up to ten digits long. Any mantissa longer than that will have its remaining digits truncated.
+//test helpers
+void testCharacteristicAndMantissa();
+void shouldConvert(const char number[], int expectedCharacteristic, int expectedNumerator, int expectedDenominator);
+void shouldNotConvert(const char number[]);
+
+const int MAXIMUM_PLACE_VALUE = 10; // Mantissa can only be up to ten digits long. Any mantissa longer than that will have its remaining digits truncated.
 
 int main()
 {
-    //this c-string, or array of 8 characters, ends with the null terminating character '\0'
-    //['1', '2', '3', '.', '4', '5', '6', '\0']
-    const char number[] = "123.456"; 
-    int c, n, d;
-
-    //if both conversions from c-string to integers can take place
-    if(characteristic(number, c) && mantissa(number, n, d))
-    {
-        //do some math with c, n, and d
-        cout<<"c: "<<c<<endl;
-        cout<<"n: "<<n<<endl;
-        cout<<"d: "<<d<<endl;
-    }
-    else //at least one of the conversions failed
-    {
-        //handle the error on input
-        cout<<"Error on input"<<endl;
-    }
+    //characteristic and mantissa test
+    testCharacteristicAndMantissa();
 
     //room for 9 characters plus the null terminating character
     char answer[10];
@@ -81,34 +70,262 @@ int main()
 
     return 0;
 } 
+
+void testCharacteristicAndMantissa()
+{
+    //number with a non-zero characteristic a decimal point and a non-zero mantissa
+    shouldConvert("123.456", 123, 456, 1000);
+    shouldConvert("    123.456", 123, 456, 1000);
+    shouldConvert("123.456    ", 123, 456, 1000);
+    shouldConvert("    123.456    ", 123, 456, 1000);
+    
+    //unary plus/minus
+    shouldConvert("+123.456", 123, 456, 1000);
+    shouldConvert("   +123.456", 123, 456, 1000);
+    shouldConvert("+123.456   ", 123, 456, 1000);
+    shouldConvert("   +123.456   ", 123, 456, 1000);
+    shouldConvert("-123.456", -123, 456, 1000);
+    shouldConvert("   -123.456", -123, 456, 1000);
+    shouldConvert("-123.456   ", -123, 456, 1000);
+    shouldConvert("    -123.456   ", -123, 456, 1000);
+
+    //number with a zero characteristic and a non-zero mantissa
+    shouldConvert("0.456", 0, 456, 1000);
+    shouldConvert("   0.456", 0, 456, 1000);
+    shouldConvert("0.456   ", 0, 456, 1000);
+    shouldConvert("   0.456   ", 0, 456, 1000);
+    
+    //number with no characteristic digits and a non-zero mantissa
+    shouldConvert(".456", 0, 456, 1000);
+    shouldConvert("    .456", 0, 456, 1000);
+    shouldConvert(".456   ", 0, 456, 1000);
+    shouldConvert("   .456   ", 0, 456, 1000);
+    
+    //number with a non-zero characteristic and no mantissa
+    shouldConvert("0", 0, 0, 10);
+    shouldConvert("-0", -0, 0, 10);
+    shouldConvert("123456", 123456, 0, 10);
+    shouldConvert("   123456", 123456, 0, 10);
+    shouldConvert("123456   ", 123456, 0, 10);
+    shouldConvert("   123456   ", 123456, 0, 10);
+    
+    //unary plus/minus
+    shouldConvert("-123456", -123456, 0, 10);
+    shouldConvert("   -123456", -123456, 0, 10);
+    shouldConvert("-123456   ", -123456, 0, 10);
+    shouldConvert("   -123456   ", -123456, 0, 10);
+    shouldConvert("+123456", 123456, 0, 10);
+    shouldConvert("   +123456", 123456, 0, 10);
+    shouldConvert("+123456   ", 123456, 0, 10);
+    shouldConvert("   +123456   ", 123456, 0, 10);
+
+    //number with a non-zero characteristic and a zero mantissa
+    shouldConvert("123456.0", 123456, 0, 10);
+    shouldConvert("   123456.0", 123456, 0, 10);
+    shouldConvert("123456.0   ", 123456, 0, 10);
+    shouldConvert("   123456.0   ", 123456, 0, 10);
+    
+    //unary plus/minus
+    shouldConvert("-123456.0", -123456, 0, 10);
+    shouldConvert("   -123456.0", -123456, 0, 10);
+    shouldConvert("-123456.0   ", -123456, 0, 10);
+    shouldConvert("   -123456.0   ", -123456, 0, 10);
+    shouldConvert("+123456.0", 123456, 0, 10);
+    shouldConvert("   +123456.0", 123456, 0, 10);
+    shouldConvert("+123456.0   ", 123456, 0, 10);
+    shouldConvert("   +123456.0   ", 123456, 0, 10);
+
+    //check leading and trailing zeros
+    shouldConvert("000123.456", 123, 456, 1000);
+    shouldConvert("123.45600000", 123, 456, 1000);
+    shouldConvert("00000123.45600000", 123, 456, 1000);
+    
+    //unary plus/minus
+    shouldConvert("-000123.456", -123, 456, 1000);
+    shouldConvert("-123.45600000", -123, 456, 1000);
+    shouldConvert("-00000123.45600000", -123, 456, 1000);
+    shouldConvert("+000123.456", 123, 456, 1000);
+    shouldConvert("+123.45600000", 123, 456, 1000);
+    shouldConvert("+00000123.45600000", 123, 456, 1000);
+
+    //significant zeros in mantissa
+    shouldConvert("123.00000456", 123, 456, 100000000);
+    shouldConvert("-123.00000456", -123, 456, 100000000);
+    shouldConvert("+123.00000456", 123, 456, 100000000);
+
+    //these should fail
+    shouldNotConvert("");
+    shouldNotConvert("   ");
+    shouldNotConvert(".");
+    shouldNotConvert("+");
+    shouldNotConvert("-");
+    shouldNotConvert("..");
+    shouldNotConvert("+.");
+    shouldNotConvert("-.");
+    shouldNotConvert("c");
+    shouldNotConvert("cat");
+    shouldNotConvert("-cat");
+    shouldNotConvert("123.");
+    shouldNotConvert("123.   ");
+    shouldNotConvert("123.456+");
+    shouldNotConvert("123.456 +");
+    shouldNotConvert("123.456 cat");
+    shouldNotConvert("123.cat");
+    shouldNotConvert("cat.456");
+    shouldNotConvert("+-123.456");
+    shouldNotConvert("1.23.456");
+    shouldNotConvert(".123.456");
+    shouldNotConvert("--123.456");
+    shouldNotConvert("123   456");
+    shouldNotConvert("123  .  456");
+    shouldNotConvert("  123  .  456");
+    shouldNotConvert("127.0.0.1");
+}
 //--
+void shouldConvert(const char number[], int expectedCharacteristic, int expectedNumerator, int expectedDenominator)
+{
+    int c, n, d;
+
+    //if the conversion from C string to integers can take place
+    if (characteristic(number, c) && mantissa(number, n, d))
+    {
+        if (c == expectedCharacteristic && n == expectedNumerator && d == expectedDenominator)
+        {
+            //test passes, do not print anything on a successful test
+        }
+        else
+        {
+            cout << "Test failed: '" << number << "' "
+                << "was parsed but did not produce the expected results" << endl;
+
+            if (expectedCharacteristic != c)
+            {
+                cout << "expected characteristic: " << expectedCharacteristic << " "
+                    << "actual characteristic: " << c << endl;
+            }
+
+            if (expectedNumerator != n)
+            {
+                cout << "expected numerator: " << expectedNumerator << " "
+                    << "actual numerator: " << n << endl;
+
+            }
+
+            if (expectedDenominator != d)
+            {
+                cout << "expected denominator: " << expectedDenominator << " "
+                    << "actual denominator: " << d << endl;
+            }
+        }
+    }
+    else
+    {
+        cout << "Test failed: '" << number << "' "
+            << "was NOT parsed when it should have been." << endl;
+        if (expectedCharacteristic != c)
+        {
+            cout << "expected characteristic: " << expectedCharacteristic << " "
+                << "actual characteristic: " << c << endl;
+        }
+
+        if (expectedNumerator != n)
+        {
+            cout << "expected numerator: " << expectedNumerator << " "
+                << "actual numerator: " << n << endl;
+
+        }
+
+        if (expectedDenominator != d)
+        {
+            cout << "expected denominator: " << expectedDenominator << " "
+                << "actual denominator: " << d << endl;
+        }
+    }
+}
+//--
+void shouldNotConvert(const char number[])
+{
+    int c, n, d;
+
+    //if the conversion from C string to integers can take place
+    if (characteristic(number, c) && mantissa(number, n, d))
+    {
+        cout << "Test failed: '" << number << "' "
+            << "was parsed when it should NOT have been." << endl;
+    }
+}
+
+
+//--
+// This function has since been restructured to parse into another C string, so that further evaluation will be tested on it
 bool characteristic(const char numString[], int& c)
 {
     c = 0; // c is reinitialized to 0 to prevent accidental changes
     int numberToAdd = 0; // The int that will be converted from the char in the C String
+
+    if(numString == ""){ // If nothing is in the numeric C String, return false before doing anything else
+        return false; // Null C Strings are not allowed!
+    }
+
     int floatingPointLocation = findCharAtPosition(numString, '.'); // The index of the floating point if it exists
+    char characteristic[MAXIMUM_PLACE_VALUE];
+    int lengthOfNumber = 0;
     // Count from the beginning of the floating point to the largest whole place value
-    for(int i = floatingPointLocation - 1; i >= 0; i--)
+    for(int i = 0; i < floatingPointLocation; i++)
     {
-        if(numString[i] == '-') // If the whole number is negative, multiply the whole result by -1
+        if (isNumericChar(numString[i]))
         {
-            c *= -1;
+            characteristic[i] = numString[i]; // Add to c the int on the C String raised to its place value
+            lengthOfNumber = i + 1;
+            // Any trailing spaces will stop the parsing
+            if(numString[i+1] == ' '){ // This goes inside the numeric condition so it only works when there are numbers found
+                break;
+            }
         }
-        else if (numString[i] == '+')
+        else if(numString[i] == '-' || numString[i] == '+') // Unary signs are acceptable as long as they precede a number
         {
-            // If the number starts with a plus sign, nothing happens because the number is positive. Move onto the next number
-        }
-        else if (isNumericChar(numString[i]))
-        {
-            numberToAdd = charToInt(numString[i]);
-            c += wholePlaceValue(numberToAdd, floatingPointLocation - i); // Add to c the int on the C String raised to its place value
+            if(isNumericChar(numString[i+1])){
+                characteristic[i] = numString[i];
+            } else {
+                return false;
+            }
+        } else if (numString[i] == ' '){ // Count any leading spaces in the string that will be discarded later
+            characteristic[i] = numString[i];
         }
         else // If an invalid character is read, return false
         {
             return false;
         }
     }
-    return true;
+    characteristic[lengthOfNumber] = '\0'; // End String with Null Terminator
+
+    // Iterating Through Character String backwards (Least Significant Digit to greatest)
+    for(int i = lengthOfNumber - 1; i >= 0; i--){
+        if(characteristic[i] == '-'){
+            if(c < 0){ // Double negatives (--) are illegal
+                return false;
+            } else if (characteristic[i + 1] == '+'){ // Negative Positives (+-) are also illegal
+                return false;
+            } else { // Multiply by -1 to get negative
+                c *= -1;
+            }
+        } else if (characteristic[i] == '+'){
+            if(c < 0){ // Negative Positives (+-) are illegal
+                return false;
+            } else if (characteristic[i + 1] == '+'){ // Positive Positives (++) are also illegal
+                return false;
+            } else {
+                // Do nothing. Unary Plus only means the float is positive
+            }
+        } else if (characteristic[i] == ' '){ // Stop iterating when we approach leading spaces
+            break;
+        } else { // Add converted int to c
+            numberToAdd = charToInt(characteristic[i]);
+            c += wholePlaceValue(numberToAdd, lengthOfNumber - i);
+        }
+    }
+
+    return true; // If no interruptions, characteristic parsing is good!
 }
 //--
 bool mantissa(const char numString[], int& numerator, int& denominator)
@@ -117,10 +334,10 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
     denominator = 0;
     //First find if the floating point exists
     int floatingPointLocation = findCharAtPosition(numString, '.');
-    if(numString[floatingPointLocation] == '\0') // If it doesn't, the mantissa becomes 0 / 1;
+    if(numString[floatingPointLocation] == '\0') // If it doesn't, the mantissa becomes 0 / 10;
     {
         numerator = 0;
-        denominator = 1;
+        denominator = 10;
     }
     else // If it does, proceed with finding the mantissa
     {
@@ -128,36 +345,63 @@ bool mantissa(const char numString[], int& numerator, int& denominator)
 
         // Go through all trailing zeroes from the floating point until we reach a number that isn't 0
         int nonZeroIndex = skipTrailingZeroes(numString, floatingPointLocation);
-        int maxRange = MAXIMUM_MANTISSA_PLACE_VALUE - nonZeroIndex;
-        char mantissa[MAXIMUM_MANTISSA_PLACE_VALUE];
-        // This variable holds the nonZeroIndex added by the index of the floating point, so that the following loop algorithm finds a mantissa number at the correct location
+        int maxRange = MAXIMUM_PLACE_VALUE;
+        char mantissa[MAXIMUM_PLACE_VALUE];
+        // This variable below holds the nonZeroIndex added by the index of the floating point, so that the following loop algorithm finds a mantissa number at the correct location
         int floatIndex = 0;
+        int numberOfZeroes = 0; // This counts the number of trailing zeroes
         for(int i = 0; i < maxRange; i++){
             floatIndex = nonZeroIndex + floatingPointLocation;
             if(isNumericChar(numString[floatIndex])){
                 mantissa[i] = numString[floatIndex];
-            } else if (numString[floatIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
+                if (numString[floatIndex] == '0'){ // Since this counter variable only stores trailing zeroes, any non-zero number will reset it
+                    numberOfZeroes++;
+                } else {
+                    numberOfZeroes = 0;
+                }
+            } else if (numString[floatIndex] == ' '){ // Any spaces will also be counted towards the mantissa. Handling them comes later on in the function
+                mantissa[i] = numString[floatIndex];
+            }
+            else if (numString[floatIndex] == '\0') // If the end of numString is reached early, stop putting more chars inside the mantissa string
             {
                 maxRange = i;
                 break;
             }
-            else // If a non-numeric character or null terminator function is found, stop the loop and return false
+            else // If a non-numeric character is found, stop the loop and return false
             {
                 return false;
             }
             nonZeroIndex++;
         }
         mantissa[maxRange] = '\0'; // End C String with null terminator (So that is functions like a C String)
-
-        // Step 2: Count backwards from the last number of the mantissa to the first, using the same algorithm as the characteristic
+        
+        // Step 2: Count backwards from the last number of the mantissa to the first, using the same algorithm as the characteristic, in order to produce the numerator
+        int numeratorRange = maxRange - numberOfZeroes; // This new variable chops off the trailing zeroes at the end, so that the numerator is calculated correctly
         int numberToAdd = 0;
-        for(int i = maxRange - 1; i >= 0; i--){
-            numberToAdd = charToInt(mantissa[i]);
-            numerator += wholePlaceValue(numberToAdd, maxRange - i); // Add to c the int on the C String raised to its place value
+        int numSpaces = 0; // Records the amount of space chars that will be excluded when adding to the numerator by place value
+        for(int i = numeratorRange - 1; i >= 0; i--){
+            if(isNumericChar(mantissa[i])){
+                numberToAdd = charToInt(mantissa[i]);
+                numerator += wholePlaceValue(numberToAdd, numeratorRange - i - numSpaces); // Add to numerator the int on the C String raised to its place value
+            } else if (mantissa[i] == ' '){
+                if(isNumericChar(mantissa[i+1])){ // Leading spaces are not allowed in a mantissa!
+                    return false;
+                }
+                numSpaces++;
+            } else { // Any other symbol, if picked up into mantissa for some reason, returns false in case.
+                return false;
+            }
         }
 
-        // Step 3: Calculate the denominator by raising ten to the length of the entire mantissa, including the trailing zeroes
+        // Step 3: Calculate the denominator by raising ten to the length of the entire mantissa, including the leading zeroes
         int mantissaLength = nonZeroIndex;
+        // Get rid of all trailing zeroes and spaces to correctly calculate mantissa
+        if (numberOfZeroes > 0){
+            mantissaLength -= numberOfZeroes;
+        }
+        if (numSpaces > 0){
+            mantissaLength -= numSpaces;
+        }
         denominator = wholePlaceValue(1, mantissaLength);
     }
     return true;
@@ -175,7 +419,7 @@ int findCharAtPosition(const char numString[], char charToFind){
 }
 
 int charToInt(char charToConvert){ // Converts a numeric char into an integer
-    int result = -1;
+    int result = 0; // FIXED: Changed result variable here to 0 since setting it to -1 was pointless
     if(isNumericChar(charToConvert)){ // Only takes whole numbers from 0 - 9, anything that isn't is returned as -1
         result = charToConvert - '0';
     }
