@@ -49,10 +49,7 @@ int main()
     c1 = 1; // Characteristic
     n1 = 1; // Numerator
     d1 = 2; // Denominator
-    c1 = 2;
-    n1 = 2;
-    d1 = 3;
-
+    
     c2 = 1;
     n2 = 1;
     d2 = 2; 
@@ -272,8 +269,8 @@ void shouldNotConvert(const char number[])
     }
 }
 
+// --- ARTHUR'S CODE ---
 
-//--
 // This function has since been restructured to parse into another C string, so that further evaluation will be tested on it
 bool characteristic(const char numString[], int& c)
 {
@@ -468,7 +465,9 @@ int skipTrailingZeroes(const char numString[], int floatPointIndex){
     return nonZeroIndex - floatPointIndex; // Then return the index of that nonzero number in the mantissa
 }
 
-//--
+// --- TYLER'S CODE ---
+
+
 bool add(int c1, int n1, int d1, int c2, int n2, int d2, char result[], int len)
 {
     //you will have to come up with an algorithm to add the two numbers
